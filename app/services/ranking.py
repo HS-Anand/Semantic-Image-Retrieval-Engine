@@ -1,10 +1,6 @@
 class RankingService:
 
-    def rank(
-        self,
-        candidates,
-        features
-    ):
+    def rank(self, candidates, features):
 
         quality_map = {
             str(feature.id): feature.quality_score

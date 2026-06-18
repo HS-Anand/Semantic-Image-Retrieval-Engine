@@ -8,41 +8,45 @@ class ImageRepository:
         self.db = db
 
 
-    def get_ranking_features(self, image_ids):
+    def get_ranking_features(self, faiss_ids):
 
         return (
             self.db
             .query(
-                ImageAsset.id,
+                ImageAsset.faiss_id,
                 ImageAsset.quality_score
             )
             .filter(
-                ImageAsset.id.in_(image_ids)
+                ImageAsset.faiss_id.in_(faiss_ids)
             )
             .all()
         )
 
 
-    def hydrate_results(self, image_ids):
+    def hydrate_results(self, faiss_ids):
 
-        results =  (
+        results = (
             self.db
             .query(
                 ImageAsset.id,
+                ImageAsset.faiss_id,
                 ImageAsset.file_name,
                 ImageAsset.image_url
             )
             .filter(
-                ImageAsset.id.in_(image_ids)
+                ImageAsset.faiss_id.in_(faiss_ids)
             )
             .all()
         )
-    
+
+
         return [
             {
                 "id": str(result.id),
+                "faiss_id": result.faiss_id,
                 "file_name": result.file_name,
                 "image_url": result.image_url
             }
+
             for result in results
         ]

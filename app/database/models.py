@@ -4,6 +4,8 @@ from sqlalchemy import Column, String, Float, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 
+from sqlalchemy import Integer
+
 from app.database.session import Base
 
 
@@ -16,6 +18,12 @@ class ImageAsset(Base):
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4
+    )
+
+    faiss_id = Column(
+        Integer,
+        unique=True,
+        index=True
     )
 
 

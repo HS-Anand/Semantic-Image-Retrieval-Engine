@@ -3,22 +3,21 @@ class RankingService:
     def rank(self, candidates, features):
 
         quality_map = {
-            str(feature.id): feature.quality_score
+            feature.faiss_id: feature.quality_score
             for feature in features
         }
 
 
         scored = []
 
-        for candidate in candidates:
 
-            image_id = candidate["id"]
+        for image_id, similarity in candidates:
 
-            final_score = (
-                0.85 * candidate["similarity"]
-                +
-                0.15 * quality_map[image_id]
-            )
+            quality_score = quality_map.get(image_id, 0)
+
+
+            final_score = (0.85 * similarity + 0.15 * quality_score)
+
 
             scored.append(
                 {

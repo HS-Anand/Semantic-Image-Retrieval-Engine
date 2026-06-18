@@ -4,7 +4,16 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.database.dependencies import get_db
-from app.services.search import SearchService
+
+from app.dependencies import (
+    get_embedding_provider,
+    get_vector_store
+)
+
+from app.embeddings.base import EmbeddingProvider
+from app.vector_store.base import VectorStore
+
+from app.services.search_search import SearchService
 
 
 router = APIRouter(
@@ -22,10 +31,28 @@ def health_check():
 
 
 @router.get("/search")
-def search_images( query: str, db: Session = Depends(get_db)):
+def search_images(
+    query: str,
 
-    search_service = SearchService(db)
+    db: Session = Depends(get_db),
+
+    embedding_provider: EmbeddingProvider = Depends(
+        get_embedding_provider
+    ),
+
+    vector_store: VectorStore = Depends(
+        get_vector_store
+    )
+):
+
+    search_service = SearchService(
+        db,
+        embedding_provider,
+        vector_store
+    )
+
     results = search_service.search(query)
+
 
     return {
         "query": query,

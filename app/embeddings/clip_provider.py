@@ -1,6 +1,8 @@
 from typing import List
 
 import torch
+torch.set_num_threads(1)
+
 from PIL import Image
 from transformers import CLIPProcessor, CLIPModel
 
@@ -22,7 +24,7 @@ class CLIPProvider(EmbeddingProvider):
 
 
     def encode_text(self, text: str) -> List[float]:
-
+        print("START CLIP")
         inputs = self.processor(
             text=text,
             return_tensors="pt",
@@ -38,7 +40,7 @@ class CLIPProvider(EmbeddingProvider):
             embedding = outputs.pooler_output
 
             embedding = self.model.text_projection(embedding)
-
+        print("END CLIP")
         return embedding[0].tolist()
 
 

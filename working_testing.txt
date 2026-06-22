@@ -1,3 +1,6 @@
 clip testing test_clip.py
 temporrary faiss index to check faiss searching create_test_index.py
 test_faiss.py
+test_quality.py to test opencv quality scoring
+app.config works test
+cloudinary upload and url test

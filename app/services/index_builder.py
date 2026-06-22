@@ -42,6 +42,9 @@ class BuildIndexService:
 
         for file_name in os.listdir(folder_path):
 
+            if not file_name.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                continue
+
             print("FILE", file_name)
 
             image_path = os.path.join(

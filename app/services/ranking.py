@@ -16,7 +16,7 @@ class RankingService:
             quality_score = quality_map.get(image_id, 0)
 
 
-            final_score = (0.85 * similarity + 0.15 * quality_score)
+            final_score = (0.975 * similarity + 0.025 * quality_score)
 
 
             scored.append(

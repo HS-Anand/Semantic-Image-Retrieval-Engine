@@ -13,7 +13,7 @@ from app.dependencies import (
 from app.embeddings.base import EmbeddingProvider
 from app.vector_store.base import VectorStore
 
-from app.services.search_search import SearchService
+from app.services.search import SearchService
 
 
 router = APIRouter(

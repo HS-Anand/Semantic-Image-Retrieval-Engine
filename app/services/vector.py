@@ -1,10 +1,28 @@
+from app.vector_store.base import VectorStore
+
+
 class VectorService:
 
-    def search(self, query_vector):
 
-        return [
-            {
-                "id": "ea46896f-30e5-469c-ba03-01ba2803b864",
-                "similarity": 0.91
-            }
-        ]
+    def __init__(
+        self,
+        vector_store: VectorStore
+    ):
+
+        self.vector_store = vector_store
+
+
+
+    def search(
+        self,
+        vector,
+        k
+    ):
+
+        return (
+            self.vector_store
+            .search(
+                vector,
+                k
+            )
+        )

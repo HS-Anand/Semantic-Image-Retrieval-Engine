@@ -8,6 +8,9 @@ class ImageQualityScorer:
 
         image = cv2.imread(image_path)
 
+        if image is None:
+            return 0.0
+
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
         variance = cv2.Laplacian(gray, cv2.CV_64F).var()

@@ -1,7 +1,24 @@
+from app.embeddings.base import EmbeddingProvider
+
+
 class EmbeddingService:
 
-    def encode_text(self, text: str):
 
-        print(f"Encoding query: {text}")
+    def __init__(
+        self,
+        provider: EmbeddingProvider
+    ):
 
-        return [0.1, 0.2, 0.3]
+        self.provider = provider
+
+
+
+    def encode_text(
+        self,
+        text: str
+    ):
+
+        return (
+            self.provider
+            .encode_text(text)
+        )

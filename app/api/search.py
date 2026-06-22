@@ -18,6 +18,7 @@ from app.schemas.search import SearchResponse
 
 from fastapi.responses import HTMLResponse
 
+
 router = APIRouter(
     tags=["Search"]
 )
@@ -32,9 +33,15 @@ def health_check():
     }
 
 
-@router.get("/search", response_model=SearchResponse)
+
+@router.get(
+    "/search",
+    response_model=SearchResponse
+)
 def search_images(
     query: str,
+    page: int = 1,
+    limit: int = 12,
 
     db: Session = Depends(get_db),
 
@@ -53,7 +60,12 @@ def search_images(
         vector_store
     )
 
-    results = search_service.search(query)
+
+    results = search_service.search(
+        query,
+        page,
+        limit
+    )
 
 
     return {
@@ -61,12 +73,16 @@ def search_images(
         "results": results
     }
 
+
+
 @router.get(
     "/search-preview",
     response_class=HTMLResponse
 )
 def search_preview(
-    query: str,
+    query: str = "",
+    page: int = 1,
+    limit: int = 12,
 
     db: Session = Depends(get_db),
 
@@ -79,47 +95,269 @@ def search_preview(
     )
 ):
 
-    search_service = SearchService(
-        db,
-        embedding_provider,
-        vector_store
-    )
+    results = []
 
 
-    results = search_service.search(query)
+    if query:
+
+        search_service = SearchService(
+            db,
+            embedding_provider,
+            vector_store
+        )
+
+
+        results = search_service.search(
+            query,
+            page,
+            limit
+        )
 
 
     html = f"""
     <html>
+
+        <head>
+
+            <style>
+
+                body {{
+                    font-family: Arial, sans-serif;
+                    margin: 40px;
+                }}
+
+
+                .logo {{
+                    position: fixed;
+
+                    top: 20px;
+                    right: 30px;
+
+                    width: 90px;
+                }}
+
+
+                .search-box {{
+
+                    text-align: center;
+
+                    margin-bottom: 40px;
+
+                }}
+
+
+                input {{
+
+                    width: 400px;
+
+                    padding: 12px;
+
+                    font-size: 16px;
+
+                    border-radius: 8px;
+
+                }}
+
+
+                button {{
+
+                    padding: 12px 20px;
+
+                    font-size: 16px;
+
+                    border-radius: 8px;
+
+                    cursor: pointer;
+
+                }}
+
+
+                .grid {{
+                    display: flex;
+
+                    flex-wrap: wrap;
+
+                    gap: 25px;
+                }}
+
+
+                .card {{
+
+                    width: 260px;
+
+                }}
+
+
+                img.result-image {{
+
+                    width: 260px;
+
+                    height: 260px;
+
+                    object-fit: cover;
+
+                    border-radius: 12px;
+
+                }}
+
+
+                h4 {{
+
+                    font-size: 14px;
+
+                    word-break: break-word;
+
+                }}
+
+
+                .pagination {{
+
+                    margin-top: 40px;
+
+                    display: flex;
+
+                    justify-content: center;
+
+                    gap: 15px;
+
+                }}
+
+
+                .pagination a {{
+
+                    font-size: 18px;
+
+                    text-decoration: none;
+
+                }}
+
+
+            </style>
+
+        </head>
+
+
         <body>
 
-        <h2>SIRE Results for: {query}</h2>
+
+            <img
+                class="logo"
+                src="/static/sire-logo.png"
+            >
+
+
+
+            <div class="search-box">
+
+
+                <h2>
+
+                    Semantic Image Retrieval Engine
+
+                </h2>
+
+
+                <form action="/api/search-preview" method="get">
+
+                    <input
+                        type="text"
+                        name="query"
+                        value="{query}"
+                        placeholder="Search images..."
+                    >
+
+
+                    <button type="submit">
+
+                        Search
+
+                    </button>
+
+
+                </form>
+
+
+            </div>
+
+
+
+            <h3>
+
+                Results for: {query}
+
+            </h3>
+
+
+            <div class="grid">
 
     """
+
 
 
     for image in results:
 
         html += f"""
 
-        <div style="margin:20px">
+            <div class="card">
 
-            <h4>{image["file_name"]}</h4>
 
-            <img 
-                src="{image["image_url"]}
-                "
-                width="300"
-            >
+                <img
 
-        </div>
+                    class="result-image"
+
+                    src="{image["image_url"]}"
+
+                >
+
+
+                <h4>
+
+                    {image["file_name"]}
+
+                </h4>
+
+
+            </div>
 
         """
 
 
+
     html += """
 
+            </div>
+
+
+            <div class="pagination">
+
+    """
+
+
+
+    if query:
+
+        for page_number in range(1, 8):
+
+            html += f"""
+
+                <a href="/api/search-preview?query={query}&page={page_number}&limit={limit}">
+
+                    {page_number}
+
+                </a>
+
+            """
+
+
+
+    html += """
+
+            </div>
+
+
         </body>
+
+
     </html>
 
     """

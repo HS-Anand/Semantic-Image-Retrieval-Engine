@@ -3,10 +3,10 @@ import random
 import shutil
 
 
-SOURCE_FOLDER = "/Users/harkarananand/Desktop/SIRE/dataset/archive/images"
+SOURCE_FOLDER = "/Users/harkarananand/Desktop/data_pattern/tribal"
 TARGET_FOLDER = "/Users/harkarananand/Desktop/SIRE/dataset"
 
-SAMPLE_SIZE = 200
+SAMPLE_SIZE = 20
 
 
 os.makedirs(

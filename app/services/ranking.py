@@ -11,12 +11,40 @@ class RankingService:
         scored = []
 
 
+        if not candidates:
+
+            return []
+
+
+        best_similarity = candidates[0][1]
+
+
+        similarity_threshold = (
+            best_similarity
+            -
+            0.06
+        )
+
+
         for image_id, similarity in candidates:
 
-            quality_score = quality_map.get(image_id, 0)
+
+            if similarity < similarity_threshold:
+
+                continue
 
 
-            final_score = (0.975 * similarity + 0.025 * quality_score)
+            quality_score = quality_map.get(
+                image_id,
+                0
+            )
+
+
+            final_score = (
+                similarity
+                +
+                0.01 * quality_score
+            )
 
 
             scored.append(

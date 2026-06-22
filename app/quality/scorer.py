@@ -8,13 +8,27 @@ class ImageQualityScorer:
 
         image = cv2.imread(image_path)
 
+
         if image is None:
+
             return 0.0
 
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        variance = cv2.Laplacian(gray, cv2.CV_64F).var()
+        gray = cv2.cvtColor(
+            image,
+            cv2.COLOR_BGR2GRAY
+        )
 
-        normalized_score = min(variance / 1000, 1.0)
 
-        return normalized_score
+        sharpness = cv2.Laplacian(
+            gray,
+            cv2.CV_64F
+        ).var()
+
+
+        if sharpness < 50:
+
+            return 0.0
+
+
+        return 1.0

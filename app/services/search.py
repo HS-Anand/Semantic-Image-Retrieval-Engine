@@ -1,3 +1,4 @@
+
 from app.embeddings.base import EmbeddingProvider
 from app.vector_store.base import VectorStore
 
@@ -23,7 +24,12 @@ class SearchService:
         self.image_repository = ImageRepository(db)
 
 
-    def search(self, query: str):
+    def search(
+        self,
+        query: str,
+        page: int = 1,
+        limit: int = 12
+    ):
 
         query_vector = (
             self.embedding_provider
@@ -34,7 +40,7 @@ class SearchService:
         candidates = (
             self.vector_store.search(
                 query_vector,
-                k=10
+                k=84
             )
         )
 
@@ -60,6 +66,9 @@ class SearchService:
             )
         )
 
+        start = (page - 1) * limit
+        end = (start+limit)
+        ranked_ids = ranked_ids[start:end]
 
         results = (
             self.image_repository

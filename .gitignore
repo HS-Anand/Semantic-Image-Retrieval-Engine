@@ -16,7 +16,6 @@ venv/
 
 # AI files (later)
 *.faiss
-*.index
 models/
 checkpoints/
 

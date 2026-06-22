@@ -17,14 +17,14 @@ from app.services.index_builder import BuildIndexService
 
 
 db = SessionLocal()
-
+INDEX_PATH = "storage/image.index"
 
 service = BuildIndexService(
     storage=CloudinaryStorage(),
 
     embedding_provider=CLIPProvider(),
 
-    index_builder=FAISSIndexBuilder(),
+    index_builder=FAISSIndexBuilder(INDEX_PATH),
 
     repository=ImageRepository(db),
 
@@ -34,7 +34,7 @@ service = BuildIndexService(
 
 service.index_folder(
     folder_path="dataset",
-    output_index_path="storage/image.index"
+    output_index_path=INDEX_PATH
 )
 
 

@@ -8,6 +8,15 @@ class ImageRepository:
 
         self.db = db
 
+    def exists_by_file_name(self, file_name):
+
+        return (
+            self.db.query(ImageAsset).filter(
+                ImageAsset.file_name == file_name
+            ).first() is not None
+        )
+
+
     def get_next_faiss_id(self):
 
         max_id = (

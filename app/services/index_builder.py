@@ -40,9 +40,15 @@ class BuildIndexService:
 
         print("DB DONE")
 
+        processed_count = 0
+
         for file_name in os.listdir(folder_path):
 
             if not file_name.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                continue
+
+            if self.repository.exists_by_file_name(file_name):
+                print("SKIPPING", file_name)
                 continue
 
             print("FILE", file_name)
@@ -81,6 +87,15 @@ class BuildIndexService:
                 faiss_id
             )
             print("FAISS DONE")
+
+            processed_count += 1
+
+
+            if processed_count % 100 == 0:
+
+                print("FAISS CHECKPOINT SAVE")
+
+                self.index_builder.save(output_index_path)
 
             print("POSTGRE STORE START")
             self.repository.create(

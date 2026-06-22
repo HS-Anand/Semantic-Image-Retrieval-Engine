@@ -1,3 +1,5 @@
+import os
+
 import faiss
 
 faiss.omp_set_num_threads(1)
@@ -10,12 +12,22 @@ from app.indexing.base import IndexBuilder
 class FAISSIndexBuilder(IndexBuilder):
 
 
-    def __init__(self):
+    def __init__(self, index_path: str):
 
-        base_index = faiss.IndexFlatIP(512)
+        if os.path.exists(index_path):
+
+            print("LOADING EXISTING INDEX")
+
+            self.index = faiss.read_index(index_path)
 
 
-        self.index = faiss.IndexIDMap(base_index)
+        else:
+
+            print("CREATING NEW INDEX")
+
+            base_index = faiss.IndexFlatIP(512)
+
+            self.index = faiss.IndexIDMap(base_index)
 
 
     def add(self, vector, faiss_id: int):

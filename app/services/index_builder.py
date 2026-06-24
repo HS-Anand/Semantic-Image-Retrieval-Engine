@@ -7,6 +7,7 @@ from app.indexing.base import IndexBuilder
 
 from app.quality.scorer import ImageQualityScorer
 from app.repositories.image_repository import ImageRepository
+from app.utils.timer import Timer
 
 
 
@@ -125,14 +126,11 @@ class BuildIndexService:
             print("QUALITY START")
 
 
-            quality_scores = [
-
-                self.quality_scorer.score(
-                    path
-                )
-
-                for path in image_paths
-            ]
+            with Timer("QUALITY"):
+                quality_scores = [
+                    self.quality_scorer.score(path)
+                    for path in image_paths
+                ]
 
 
             print("QUALITY DONE")
@@ -141,13 +139,11 @@ class BuildIndexService:
 
             print("CLIP START")
 
-
-            vectors = (
-                self.embedding_provider
-                .encode_images(
-                    image_paths
+            with Timer("CLIP BATCH"):
+                vectors = (
+                    self.embedding_provider
+                    .encode_images(image_paths)
                 )
-            )
 
 
             print("CLIP DONE")
@@ -156,12 +152,10 @@ class BuildIndexService:
 
             print("CLOUDINARY START")
 
-
-            urls = (
-                self.storage.upload_many(
-                    image_paths
+            with Timer("CLOUDINARY BATCH"):
+                urls = (
+                    self.storage.upload_many(image_paths)
                 )
-            )
 
 
             print("CLOUDINARY DONE")
@@ -179,11 +173,8 @@ class BuildIndexService:
 
             print("FAISS START")
 
-
-            self.index_builder.add_many(
-                vectors,
-                faiss_ids
-            )
+            with Timer("FAISS ADD"):
+                self.index_builder.add_many(vectors,faiss_ids)
 
 
             print("FAISS DONE")
@@ -214,10 +205,8 @@ class BuildIndexService:
 
             print("POSTGRES START")
 
-
-            self.repository.create_many(
-                db_rows
-            )
+            with Timer("POSTGRES BULK INSERT"):
+                self.repository.create_many(db_rows)
 
 
             print("POSTGRES DONE")

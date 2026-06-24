@@ -40,7 +40,7 @@ class SearchService:
         candidates = (
             self.vector_store.search(
                 query_vector,
-                k=84
+                k=200
             )
         )
 

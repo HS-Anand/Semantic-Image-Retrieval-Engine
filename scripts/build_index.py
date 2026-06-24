@@ -1,4 +1,6 @@
 import os
+from app.utils import timer
+from app.utils.timer import Timer
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -31,11 +33,39 @@ service = BuildIndexService(
     quality_scorer=ImageQualityScorer()
 )
 
-
-service.index_folder(
-    folder_path="dataset",
-    output_index_path=INDEX_PATH
+IMAGE_COUNT = len(
+    [
+        file
+        for file in os.listdir("dataset")
+        if file.lower().endswith(
+            (
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".webp"
+            )
+        )
+    ]
 )
+
+with Timer("TOTAL INDEXING TIME") as total_timer:
+
+    service.index_folder(
+        folder_path="dataset",
+        output_index_path=INDEX_PATH
+    )
 
 
 print("Index build completed")
+
+
+print(
+    "Images/sec:",
+    round(IMAGE_COUNT / total_timer.duration, 2)
+)
+
+
+print(
+    "Images/min:", 
+    round((IMAGE_COUNT / total_timer.duration) * 60, 2)
+)

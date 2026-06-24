@@ -1,11 +1,14 @@
 import os
 
+
 from app.storage.base import ImageStorage
 from app.embeddings.base import EmbeddingProvider
 from app.indexing.base import IndexBuilder
 
 from app.quality.scorer import ImageQualityScorer
 from app.repositories.image_repository import ImageRepository
+
+
 
 class BuildIndexService:
 
@@ -29,85 +32,216 @@ class BuildIndexService:
 
         self.quality_scorer = quality_scorer
 
+
+
     def index_folder(
-        self, folder_path: str,
-        output_index_path: str
-        ):
+        self,
+        folder_path: str,
+        output_index_path: str,
+        batch_size: int = 64
+    ):
+
 
         print("START INDEX")
 
-        faiss_id = (self.repository.get_next_faiss_id())
 
-        print("DB DONE")
+        next_faiss_id = (
+            self.repository.get_next_faiss_id()
+        )
 
-        processed_count = 0
+
+        all_files = []
+
 
         for file_name in os.listdir(folder_path):
 
-            if not file_name.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+
+            if not file_name.lower().endswith(
+                (
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".webp"
+                )
+            ):
                 continue
 
-            if self.repository.exists_by_file_name(file_name):
-                print("SKIPPING", file_name)
+
+            if self.repository.exists_by_file_name(
+                file_name
+            ):
+                print(
+                    "SKIPPING",
+                    file_name
+                )
+
                 continue
 
-            print("FILE", file_name)
 
-            image_path = os.path.join(
-                folder_path,
+            all_files.append(
                 file_name
             )
 
+
+        print(
+            "FILES TO INDEX:",
+            len(all_files)
+        )
+
+
+
+        for start in range(
+            0,
+            len(all_files),
+            batch_size
+        ):
+
+
+            batch_files = all_files[
+                start:start + batch_size
+            ]
+
+
+            print(
+                "PROCESSING BATCH",
+                start,
+                "-",
+                start + len(batch_files)
+            )
+
+
+
+            image_paths = [
+                os.path.join(
+                    folder_path,
+                    file_name
+                )
+
+                for file_name in batch_files
+            ]
+
+
+
             print("QUALITY START")
 
-            quality_score = (
-                self.quality_scorer.score(image_path)
-            )
+
+            quality_scores = [
+
+                self.quality_scorer.score(
+                    path
+                )
+
+                for path in image_paths
+            ]
+
 
             print("QUALITY DONE")
+
+
+
             print("CLIP START")
 
-            vector = (
+
+            vectors = (
                 self.embedding_provider
-                .encode_image(image_path)
+                .encode_images(
+                    image_paths
+                )
             )
+
 
             print("CLIP DONE")
-            print("CLOUDINARY UPLOAD START")
 
 
-            image_url = (
-                self.storage.upload(image_path)
+
+            print("CLOUDINARY START")
+
+
+            urls = (
+                self.storage.upload_many(
+                    image_paths
+                )
             )
+
+
             print("CLOUDINARY DONE")
 
-            print("faiss START")
-            self.index_builder.add(
-                vector,
-                faiss_id
+
+
+            faiss_ids = list(
+                range(
+                    next_faiss_id,
+                    next_faiss_id + len(batch_files)
+                )
             )
+
+
+
+            print("FAISS START")
+
+
+            self.index_builder.add_many(
+                vectors,
+                faiss_ids
+            )
+
+
             print("FAISS DONE")
 
-            processed_count += 1
 
 
-            if processed_count % 100 == 0:
+            db_rows = []
 
-                print("FAISS CHECKPOINT SAVE")
 
-                self.index_builder.save(output_index_path)
+            for i in range(
+                len(batch_files)
+            ):
 
-            print("POSTGRE STORE START")
-            self.repository.create(
-                faiss_id=faiss_id,
-                file_name=file_name,
-                image_url=image_url,
-                quality_score=quality_score
+
+                db_rows.append(
+                    {
+                        "faiss_id": faiss_ids[i],
+
+                        "file_name": batch_files[i],
+
+                        "image_url": urls[i],
+
+                        "quality_score": quality_scores[i]
+                    }
+                )
+
+
+
+            print("POSTGRES START")
+
+
+            self.repository.create_many(
+                db_rows
             )
-            print("POSTGRE DONE")
 
 
-            faiss_id += 1
+            print("POSTGRES DONE")
 
 
-        self.index_builder.save(output_index_path)
+
+            next_faiss_id += len(
+                batch_files
+            )
+
+
+
+            print("SAVE CHECKPOINT\n")
+
+
+            self.index_builder.save(
+                output_index_path
+            )
+
+
+
+        print("FINAL SAVE")
+
+
+        self.index_builder.save(
+            output_index_path
+        )

@@ -49,6 +49,26 @@ class FAISSIndexBuilder(IndexBuilder):
 
         self.index.add_with_ids(embedding, ids)
 
+    
+    def add_many(self, vectors, faiss_ids):
+
+        embeddings = np.array(
+            vectors,
+            dtype="float32"
+        )
+
+
+        faiss.normalize_L2(embeddings)
+
+
+        ids = np.array(
+            faiss_ids,
+            dtype="int64"
+        )
+
+
+        self.index.add_with_ids(embeddings, ids)
+
 
     def save(self, path: str):
 

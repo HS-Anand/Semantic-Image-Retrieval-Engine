@@ -12,3 +12,7 @@ class EmbeddingProvider(ABC):
     @abstractmethod
     def encode_image(self, image_path: str) -> List[float]:
         pass
+
+    @abstractmethod
+    def encode_images(self, image_paths: List[str]) -> List[List[float]]:
+        pass

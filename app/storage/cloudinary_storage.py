@@ -1,3 +1,7 @@
+from typing import List
+
+from concurrent.futures import ThreadPoolExecutor
+
 import cloudinary
 import cloudinary.uploader
 
@@ -27,3 +31,19 @@ class CloudinaryStorage(ImageStorage):
 
 
         return response["secure_url"]
+    
+
+    def upload_many(self, image_paths: List[str]) -> List[str]:
+
+        with ThreadPoolExecutor(max_workers=32) as executor:
+
+
+            urls = list(
+                executor.map(
+                    self.upload,
+                    image_paths
+                )
+            )
+
+
+        return urls

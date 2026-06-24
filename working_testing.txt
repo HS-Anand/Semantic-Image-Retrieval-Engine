@@ -4,3 +4,5 @@ test_faiss.py
 test_quality.py to test opencv quality scoring
 app.config works test
 cloudinary upload and url test
+tested batch clipping and batch faiss generation
+tested batch insertion in both postgresql and then cloudinary with 8 workers, threads

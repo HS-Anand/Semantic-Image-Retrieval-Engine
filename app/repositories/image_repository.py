@@ -100,3 +100,25 @@ class ImageRepository:
 
 
         return image 
+    
+
+    def create_many(self, images_data):
+
+        images = [
+            ImageAsset(
+                faiss_id=data["faiss_id"],
+                file_name=data["file_name"],
+                image_url=data["image_url"],
+                quality_score=data["quality_score"],
+                category=data.get("category"),
+                index_status="INDEXED"
+            )
+            for data in images_data
+        ]
+
+
+        self.db.add_all(images)
+        
+        self.db.commit()
+
+        return images

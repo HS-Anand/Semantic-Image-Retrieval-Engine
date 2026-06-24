@@ -46,7 +46,7 @@ class CLIPProvider(EmbeddingProvider):
 
     def encode_image(self, image_path: str) -> List[float]:
 
-        image = Image.open(image_path)
+        image = Image.open(image_path).convert("RGB")
 
         inputs = self.processor(
             images=image,
@@ -64,3 +64,33 @@ class CLIPProvider(EmbeddingProvider):
             embedding = self.model.visual_projection(embedding)
 
         return embedding[0].tolist()
+
+
+    def encode_images(self, image_paths: List[str]) -> List[List[float]]:
+
+
+        images = [
+            Image.open(path).convert("RGB")
+            for path in image_paths
+        ]
+
+
+        inputs = self.processor(
+            images=images,
+            return_tensors="pt",
+            padding=True
+        )
+
+
+        with torch.no_grad():
+
+            outputs = self.model.vision_model(pixel_values=inputs["pixel_values"])
+
+
+            embeddings = outputs.pooler_output
+
+
+            embeddings = self.model.visual_projection(embeddings)
+
+
+        return embeddings.tolist()

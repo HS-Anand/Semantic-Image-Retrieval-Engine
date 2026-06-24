@@ -9,6 +9,9 @@ class IndexBuilder(ABC):
     def add(self, vector: List[float], item_id: int):
         pass
 
+    @abstractmethod
+    def add_many(self, vectors: List[List[float]], item_ids: List[int]):
+        pass
 
     @abstractmethod
     def save(self, path: str):

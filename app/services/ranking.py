@@ -18,11 +18,14 @@ class RankingService:
 
         best_similarity = candidates[0][1]
 
+        if best_similarity < 0.26:
+            return []
+
 
         similarity_threshold = (
             best_similarity
             -
-            0.06
+            0.05
         )
 
 

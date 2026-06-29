@@ -9,6 +9,7 @@ from app.quality.scorer import ImageQualityScorer
 from app.repositories.image_repository import ImageRepository
 from app.utils.timer import Timer
 
+from PIL import Image
 
 
 class BuildIndexService:
@@ -34,6 +35,17 @@ class BuildIndexService:
         self.quality_scorer = quality_scorer
 
 
+    def _is_valid_image(self, image_path: str) -> bool:
+
+        try:
+            with Image.open(image_path) as image:
+                image.verify()
+            return True
+
+        except Exception:
+            print(f"SKIPPING CORRUPTED IMAGE: {image_path}")
+            return False
+
 
     def index_folder(
         self,
@@ -41,21 +53,20 @@ class BuildIndexService:
         output_index_path: str,
         batch_size: int = 64
     ):
+        
+        if not os.path.isdir(folder_path):
+            print(f"\nDataset folder not found: {folder_path}\n")
+            return
 
 
         print("START INDEX")
 
 
-        next_faiss_id = (
-            self.repository.get_next_faiss_id()
-        )
-
+        next_faiss_id = (self.repository.get_next_faiss_id())
 
         all_files = []
 
-
         for file_name in os.listdir(folder_path):
-
 
             if not file_name.lower().endswith(
                 (
@@ -68,63 +79,42 @@ class BuildIndexService:
                 continue
 
 
-            if self.repository.exists_by_file_name(
-                file_name
-            ):
-                print(
-                    "SKIPPING",
-                    file_name
-                )
+            if self.repository.exists_by_file_name(file_name):
+                print("SKIPPING", file_name)
+                continue
 
+            all_files.append(file_name)
+
+        if not all_files:
+            print("\nNo supported images found.\n")
+            return
+
+
+        print("FILES TO INDEX:", len(all_files))
+
+        for start in range(0, len(all_files), batch_size):
+
+            batch_files = all_files[start:start + batch_size]
+
+            print("PROCESSING BATCH", start, "-", start + len(batch_files))
+
+            valid_files = []
+
+            image_paths = []
+
+            for file_name in batch_files:
+
+                image_path = os.path.join(folder_path, file_name)
+
+                if self._is_valid_image(image_path):
+                    valid_files.append(file_name)
+                    image_paths.append(image_path)
+
+            if not image_paths:
                 continue
 
 
-            all_files.append(
-                file_name
-            )
-
-
-        print(
-            "FILES TO INDEX:",
-            len(all_files)
-        )
-
-
-
-        for start in range(
-            0,
-            len(all_files),
-            batch_size
-        ):
-
-
-            batch_files = all_files[
-                start:start + batch_size
-            ]
-
-
-            print(
-                "PROCESSING BATCH",
-                start,
-                "-",
-                start + len(batch_files)
-            )
-
-
-
-            image_paths = [
-                os.path.join(
-                    folder_path,
-                    file_name
-                )
-
-                for file_name in batch_files
-            ]
-
-
-
             print("QUALITY START")
-
 
             with Timer("QUALITY"):
                 quality_scores = [
@@ -132,9 +122,7 @@ class BuildIndexService:
                     for path in image_paths
                 ]
 
-
             print("QUALITY DONE")
-
 
 
             print("CLIP START")
@@ -145,30 +133,23 @@ class BuildIndexService:
                     .encode_images(image_paths)
                 )
 
-
             print("CLIP DONE")
-
 
 
             print("CLOUDINARY START")
 
             with Timer("CLOUDINARY BATCH"):
-                urls = (
-                    self.storage.upload_many(image_paths)
-                )
-
+                urls = (self.storage.upload_many(image_paths))
 
             print("CLOUDINARY DONE")
-
 
 
             faiss_ids = list(
                 range(
                     next_faiss_id,
-                    next_faiss_id + len(batch_files)
+                    next_faiss_id + len(valid_files)
                 )
             )
-
 
 
             print("FAISS START")
@@ -176,31 +157,21 @@ class BuildIndexService:
             with Timer("FAISS ADD"):
                 self.index_builder.add_many(vectors,faiss_ids)
 
-
             print("FAISS DONE")
-
 
 
             db_rows = []
 
-
-            for i in range(
-                len(batch_files)
-            ):
-
+            for i in range(len(valid_files)):
 
                 db_rows.append(
                     {
                         "faiss_id": faiss_ids[i],
-
-                        "file_name": batch_files[i],
-
+                        "file_name": valid_files[i],
                         "image_url": urls[i],
-
                         "quality_score": quality_scores[i]
                     }
                 )
-
 
 
             print("POSTGRES START")
@@ -208,29 +179,17 @@ class BuildIndexService:
             with Timer("POSTGRES BULK INSERT"):
                 self.repository.create_many(db_rows)
 
-
             print("POSTGRES DONE")
 
 
-
-            next_faiss_id += len(
-                batch_files
-            )
-
+            next_faiss_id += len(valid_files)
 
 
             print("SAVE CHECKPOINT\n")
 
-
-            self.index_builder.save(
-                output_index_path
-            )
-
+            self.index_builder.save(output_index_path)
 
 
         print("FINAL SAVE")
 
-
-        self.index_builder.save(
-            output_index_path
-        )
+        self.index_builder.save(output_index_path)

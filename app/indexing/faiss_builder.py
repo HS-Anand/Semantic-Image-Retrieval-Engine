@@ -72,7 +72,9 @@ class FAISSIndexBuilder(IndexBuilder):
 
     def save(self, path: str):
 
-        faiss.write_index(
-            self.index,
-            path
-        )
+        try:
+            faiss.write_index(self.index, path)
+
+        except:
+            print(f"Failed to save FAISS index: {path}")
+            raise

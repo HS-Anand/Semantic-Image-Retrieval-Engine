@@ -21,16 +21,23 @@ class CloudinaryStorage(ImageStorage):
         )
 
 
-    def upload(self, image_path: str) -> str:
+    def upload(self, image_path: str) -> str | None:
+
+        for attempt in range(3):
+
+            try:
+                response = cloudinary.uploader.upload(
+                    image_path,
+                    folder="sire-images"
+                )
+                return response["secure_url"]
+
+            except Exception:
+                print(f"Upload failed ({attempt + 1}/3): {image_path}")
+
+        raise RuntimeError(f"Cloudinary upload failed: {image_path}")
 
 
-        response = cloudinary.uploader.upload(
-            image_path,
-            folder="sire-images"
-        )
-
-
-        return response["secure_url"]
     
 
     def upload_many(self, image_paths: List[str]) -> List[str]:

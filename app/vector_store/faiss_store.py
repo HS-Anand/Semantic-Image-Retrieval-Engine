@@ -12,7 +12,10 @@ class FAISSVectorStore(VectorStore):
 
 
     def __init__(self, index_path: str):
-        self.index = faiss.read_index(index_path)
+        try:
+            self.index = faiss.read_index(index_path)
+        except Exception:
+            raise RuntimeError(f"FAISS index not found: {index_path}")
 
 
     def search(self, vector: List[float], k: int) -> List[Tuple[int, float]]:

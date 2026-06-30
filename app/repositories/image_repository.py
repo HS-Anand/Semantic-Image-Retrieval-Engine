@@ -2,6 +2,8 @@
 from app.database.models import ImageAsset
 from sqlalchemy import func
 
+from app.utils.logger import error_logger
+
 class ImageRepository:
 
     def __init__(self, db):
@@ -125,4 +127,5 @@ class ImageRepository:
         
         except Exception:
             self.db.rollback()
+            error_logger.error("PostgreSQL transaction rolled back.")
             raise

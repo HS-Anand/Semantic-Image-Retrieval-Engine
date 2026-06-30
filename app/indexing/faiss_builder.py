@@ -8,6 +8,8 @@ import numpy as np
 
 from app.indexing.base import IndexBuilder
 
+from app.utils.logger import error_logger
+
 
 class FAISSIndexBuilder(IndexBuilder):
 
@@ -77,4 +79,5 @@ class FAISSIndexBuilder(IndexBuilder):
 
         except:
             print(f"Failed to save FAISS index: {path}")
+            error_logger.error("Failed to save FAISS index.")
             raise

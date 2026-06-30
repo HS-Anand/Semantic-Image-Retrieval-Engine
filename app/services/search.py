@@ -5,6 +5,7 @@ from app.services.ranking import RankingService
 from app.repositories.image_repository import ImageRepository
 
 from app.utils.timer import Timer
+from app.utils.logger import query_logger, error_logger
 
 
 class SearchService:
@@ -33,10 +34,14 @@ class SearchService:
     ):
 
         if not query.strip():
+            query_logger.info(f'Query completed. Results=0')
+            error_logger.info(f'Empty query in search')
             return []
 
         page = max(page, 1)
         limit = max(limit, 1)
+
+        query_logger.info(f'Query="{query}" Page={page} Limit={limit}')
 
         try:
 
@@ -103,11 +108,9 @@ class SearchService:
                         )
                     )
 
-
+                query_logger.info(f'Query completed. Results={len(results)}')
                 return results
 
         except Exception:
-
-            raise RuntimeError(
-                "Search failed."
-            )
+            error_logger.info('Search failed')
+            raise RuntimeError("Search failed.")

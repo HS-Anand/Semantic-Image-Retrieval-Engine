@@ -8,6 +8,8 @@ import cloudinary.uploader
 from app.config import settings
 from app.storage.base import ImageStorage
 
+from app.utils.logger import error_logger
+
 
 class CloudinaryStorage(ImageStorage):
 
@@ -34,7 +36,9 @@ class CloudinaryStorage(ImageStorage):
 
             except Exception:
                 print(f"Upload failed ({attempt + 1}/3): {image_path}")
+                error_logger.warning(f"Upload retry {attempt+1}/3: {image_path}")
 
+        error_logger.error(f"Upload failed: {image_path}")
         raise RuntimeError(f"Cloudinary upload failed: {image_path}")
 
 

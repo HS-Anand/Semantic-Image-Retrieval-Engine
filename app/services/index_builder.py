@@ -7,7 +7,9 @@ from app.indexing.base import IndexBuilder
 
 from app.quality.scorer import ImageQualityScorer
 from app.repositories.image_repository import ImageRepository
+
 from app.utils.timer import Timer
+from app.utils.logger import index_logger, error_logger
 
 from PIL import Image
 
@@ -44,6 +46,7 @@ class BuildIndexService:
 
         except Exception:
             print(f"SKIPPING CORRUPTED IMAGE: {image_path}")
+            error_logger.warning(f"Corrupted image skipped: {image_path}")
             return False
 
 
@@ -56,10 +59,12 @@ class BuildIndexService:
         
         if not os.path.isdir(folder_path):
             print(f"\nDataset folder not found: {folder_path}\n")
+            error_logger.warning(f"Dataset folder not found: {folder_path}")
             return
 
 
         print("START INDEX")
+        index_logger.info("Indexing started")
 
 
         next_faiss_id = (self.repository.get_next_faiss_id())
@@ -87,16 +92,19 @@ class BuildIndexService:
 
         if not all_files:
             print("\nNo supported images found.\n")
+            error_logger.warning(f"No supported images found in dataset")
             return
 
 
         print("FILES TO INDEX:", len(all_files))
+        index_logger.info(f"Found {len(all_files)} images to index.")
 
         for start in range(0, len(all_files), batch_size):
 
             batch_files = all_files[start:start + batch_size]
 
             print("PROCESSING BATCH", start, "-", start + len(batch_files))
+            index_logger.info(f"Processing batch {start} - {start + len(batch_files)}")
 
             valid_files = []
 
@@ -189,7 +197,11 @@ class BuildIndexService:
 
             self.index_builder.save(output_index_path)
 
+            index_logger.info("Checkpoint saved")
+
 
         print("FINAL SAVE")
 
         self.index_builder.save(output_index_path)
+
+        index_logger.info("Indexing completed")

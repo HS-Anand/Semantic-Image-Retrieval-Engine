@@ -1,13 +1,13 @@
 # Semantic Image Retrieval Engine (SIRE)
 
-## Low-latency semantic image retrieval using natural language search.
-
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
 ![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-orange)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 ![PyTorch](https://img.shields.io/badge/PyTorch-CLIP-red)
 ![Tests](https://img.shields.io/badge/Tests-12%20Passed-brightgreen)
+
+## Low-latency semantic image retrieval using natural language search.
 
 SIRE is a backend system that transforms unstructured image collections into searchable vector representations through an offline indexing pipeline and retrieves semantically relevant images from natural language queries in milliseconds.
 

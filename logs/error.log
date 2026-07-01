@@ -22,3 +22,7 @@
 2026-07-01 11:36:06,635 | WARNING | No supported images found in dataset
 2026-07-01 11:36:06,645 | INFO | Empty query in search
 2026-07-01 11:36:06,647 | INFO | Search failed
+2026-07-01 12:41:03,127 | WARNING | Dataset folder not found: invalid/path
+2026-07-01 12:41:03,129 | WARNING | No supported images found in dataset
+2026-07-01 12:41:03,140 | INFO | Empty query in search
+2026-07-01 12:41:03,142 | INFO | Search failed

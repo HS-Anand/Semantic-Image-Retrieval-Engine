@@ -49,3 +49,8 @@
 2026-07-01 11:38:29,442 | INFO | Processing batch 0 - 2
 2026-07-01 11:38:39,604 | INFO | Checkpoint saved
 2026-07-01 11:38:39,622 | INFO | Indexing completed
+2026-07-01 12:41:03,129 | INFO | Indexing started
+2026-07-01 12:41:03,130 | INFO | Indexing started
+2026-07-01 12:41:03,130 | INFO | Found 1 images to index.
+2026-07-01 12:41:03,130 | INFO | Processing batch 0 - 1
+2026-07-01 12:41:03,130 | INFO | Indexing completed

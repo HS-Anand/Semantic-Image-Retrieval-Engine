@@ -1,6 +1,5 @@
 import os
 
-
 from app.storage.base import ImageStorage
 from app.embeddings.base import EmbeddingProvider
 from app.indexing.base import IndexBuilder

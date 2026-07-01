@@ -3,12 +3,10 @@ import cv2
 
 class ImageQualityScorer:
 
-
     def score(self, image_path: str) -> float:
 
         image = cv2.imread(image_path)
         
-
         if image is None:
             return 0.0
 

@@ -329,12 +329,7 @@ The retrieval pipeline avoids expensive image processing during search, enabling
 SIRE includes **12 automated unit tests** covering the core retrieval pipeline, ranking logic, indexing workflow, and fault-tolerance scenarios.
 
 
-
-# Testing
-
-SIRE includes **12 automated unit tests** covering the project's core business logic.
-
-## Test Coverage
+### Test Coverage
 
 | Component | Tests |
 |-----------|------:|

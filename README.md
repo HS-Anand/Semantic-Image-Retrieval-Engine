@@ -25,7 +25,7 @@ Instead of relying on filenames, folders, or manually assigned tags, SIRE unders
 
 ## Search Preview
 
-<img src="images/search-preview.png" alt="Search Preview" width="900"/>
+<img src="images/retreivel images/retreived_images.png" alt="Search Preview" width="900"/>
 
 Users can search using natural language queries such as:
 
@@ -77,6 +77,50 @@ This architecture enables fast semantic retrieval while keeping vector search an
 
 
 # Engineering Highlights
+
+
+### Tech Stack
+
+## Backend
+
+- FastAPI
+- SQLAlchemy
+- Pydantic
+
+## Vector Search
+
+- FAISS
+
+## Embedding Model
+
+- OpenAI CLIP (ViT-B/32)
+
+## Database
+
+- PostgreSQL
+
+## Cloud Storage
+
+- Cloudinary
+
+## Image Processing
+
+- Pillow
+- OpenCV
+
+## Machine Learning
+
+- PyTorch
+- Hugging Face Transformers
+
+## Testing
+
+- Pytest
+
+## Deployment
+
+- Render
+
 
 ### Offline Batch Indexing Pipeline
 
@@ -142,32 +186,42 @@ Images that are semantically similar but visually sharper receive a small rankin
 
 ---
 
-### Fault Tolerance
+# Fault Tolerance
 
 The indexing and retrieval pipelines gracefully handle common failure scenarios.
 
-**Offline Indexing**
+## Offline Indexing
 
-- Missing dataset directory
-- Empty dataset
-- Unsupported file formats
-- Corrupted image detection
-- Cloudinary upload failures
-- PostgreSQL transaction rollback
+The indexing pipeline validates images and external services before persisting data.
 
-**Online Retrieval**
-
-- Empty search queries
-- Missing FAISS index
-- CLIP embedding failures
-- Database failures
-- Invalid pagination
+| Scenario | Handling |
+|----------|----------|
+| Dataset folder missing | Indexing exits gracefully |
+| Empty dataset | Indexing terminates safely |
+| Unsupported file formats | Files skipped |
+| Corrupted images | Image skipped, processing continues |
+| Cloudinary upload failure | Exception raised and logged |
+| PostgreSQL failure | Transaction rolled back |
 
 ---
 
-### Logging
+## Online Retrieval
 
-SIRE maintains separate logs for indexing, query execution, and runtime errors.
+The retrieval pipeline validates requests and handles runtime failures without exposing internal implementation details.
+
+| Scenario | Handling |
+|----------|----------|
+| Empty search query | Returns an empty result |
+| Missing FAISS index | Runtime error raised |
+| CLIP encoding failure | Search terminated safely |
+| Database failure | Error logged and propagated |
+| Invalid pagination | Automatically corrected |
+
+---
+
+# Logging
+
+To simplify debugging and monitor pipeline execution, SIRE maintains separate log files for indexing, query execution, and runtime failures.
 
 **Index Logs**
 
@@ -195,6 +249,14 @@ This makes indexing progress and runtime failures easy to monitor and debug.
 
 ---
 
+## Sample Logs
+
+<p align="center">
+<img src="images/logs_images/error-log.png" width="900"/>
+</p>
+
+---
+
 ### Performance Optimization
 
 Several optimizations were introduced to reduce indexing time.
@@ -207,27 +269,107 @@ Several optimizations were introduced to reduce indexing time.
 
 These optimizations improved indexing throughput from approximately **75 images/minute** to over **500 images/minute** on the development machine.
 
+# Benchmark Results
+
+| Metric | Before Optimization | After Optimization |
+|---------|--------------------:|-------------------:|
+| Images / Minute | ~75 | **508+** |
+| Improvement | — | **6.7× Faster** |
+
+---
+
+## Sample Output
+
+<p align="center">
+<img src="images/offline-image-batch_processing/7.5k/Screenshot 2026-06-24 at 5.13.38 PM.png" width="850"/>
+</p>
+
+
+## Search Performance
+
+Since all image embeddings are generated offline, online retrieval performs only lightweight operations.
+
+Typical search flow:
+
+```
+Natural Language Query
+
+↓
+
+CLIP Text Encoding
+
+↓
+
+FAISS Vector Search
+
+↓
+
+Ranking
+
+↓
+
+Metadata Hydration
+
+↓
+
+Results
+```
+
+The retrieval pipeline avoids expensive image processing during search, enabling responsive query execution.
+
+<p align="center">
+<img src="images/online-query->image-retreival/Screenshot 2026-06-26 at 9.58.00 AM.png" width="850"/>
+</p>
+
+
 ---
 
 ## Testing
 
 SIRE includes **12 automated unit tests** covering the core retrieval pipeline, ranking logic, indexing workflow, and fault-tolerance scenarios.
 
-### Test Coverage
 
-- ✅ RankingService (4)
-- ✅ SearchService (3)
-- ✅ BuildIndexService (3)
-- ✅ FAISSVectorStore (2)
 
-**Results**
+# Testing
+
+SIRE includes **12 automated unit tests** covering the project's core business logic.
+
+## Test Coverage
+
+| Component | Tests |
+|-----------|------:|
+| RankingService | 4 |
+| SearchService | 3 |
+| BuildIndexService | 3 |
+| FAISSVectorStore | 2 |
+| **Total** | **12** |
+
+The test suite validates:
+
+- Ranking correctness
+- Similarity threshold filtering
+- Quality-aware tie breaking
+- Search pipeline execution
+- Failure handling
+- Indexing validation
+- Corrupted image detection
+- FAISS ID mapping
+
+---
+
+## Test Results
 
 <p align="center">
-  <img src="images/tests-passed.png" width="850"/>
+<img src="images/testcases_images/test_cases.png" width="900"/>
 </p>
 
-The test suite verifies ranking correctness, search orchestration, indexing fault tolerance, and vector retrieval behavior.
+```
+========================================================
+12 passed in 0.70s
+========================================================
+```
 
+The tests focus on validating application logic rather than third-party libraries, ensuring the retrieval pipeline behaves correctly under both normal and failure scenarios.
 
 # Architecture
 
@@ -343,19 +485,27 @@ JSON Response
 ## Project Structure
 
 ```
-app/
+SIRE/
 
-├── api/                 # FastAPI routes
-├── services/            # Search and indexing workflows
-├── repositories/        # Database operations
-├── embeddings/          # CLIP embedding provider
-├── vector_store/        # FAISS retrieval
-├── indexing/            # FAISS index builder
-├── storage/             # Cloudinary integration
-├── quality/             # Image quality scoring
-├── database/            # SQLAlchemy models and session
-├── schemas/             # API request/response models
-└── utils/               # Logging and performance timers
+├── app/
+│
+├── api/                # FastAPI routes
+├── database/           # SQLAlchemy models and sessions
+├── embeddings/         # CLIP embedding provider
+├── indexing/           # FAISS index builder
+├── quality/            # Image quality scoring
+├── repositories/       # Database access layer
+├── schemas/            # Request and response models
+├── services/           # Indexing and search workflows
+├── storage/            # Cloudinary integration
+├── utils/              # Logging and timers
+├── vector_store/       # FAISS retrieval
+│
+├── dataset/            # Images to index
+├── storage/            # FAISS index
+├── scripts/            # Offline indexing scripts
+├── tests/              # Automated unit tests
+└── requirements.txt
 ```
 
 ---
@@ -479,134 +629,6 @@ This status can be extended in the future for workflows such as:
 
 without affecting the retrieval pipeline.
 
-
-# Performance Benchmarks
-
-The indexing pipeline was profiled and optimized to improve throughput while keeping the retrieval pipeline lightweight.
-
-The most expensive stages during indexing were CLIP embedding generation, Cloudinary uploads, PostgreSQL inserts, and FAISS indexing.
-
-Several optimizations were introduced to reduce repeated overhead and improve overall throughput.
-
----
-
-## Optimizations
-
-### Batch CLIP Inference
-
-Instead of generating embeddings one image at a time, images are processed in batches.
-
-Benefits:
-
-- Reduced model invocation overhead
-- Better CPU utilization
-- Higher indexing throughput
-
----
-
-### Batch Cloudinary Uploads
-
-Images are uploaded in batches rather than sequentially.
-
-Benefits:
-
-- Lower network overhead
-- Improved upload throughput
-
----
-
-### Bulk PostgreSQL Inserts
-
-Metadata is inserted using bulk database operations instead of individual insert statements.
-
-Benefits:
-
-- Fewer database round trips
-- Faster metadata persistence
-
----
-
-### Batch FAISS Indexing
-
-Image vectors are added to the FAISS index in batches.
-
-Benefits:
-
-- Reduced indexing overhead
-- Faster vector insertion
-
----
-
-### Incremental Checkpoint Saving
-
-The FAISS index is periodically saved during indexing.
-
-Benefits:
-
-- Prevents complete progress loss
-- Improves recovery after failures
-
----
-
-# Benchmark Results
-
-| Metric | Before Optimization | After Optimization |
-|---------|--------------------:|-------------------:|
-| Images / Minute | ~75 | **508+** |
-| Improvement | — | **6.7× Faster** |
-
----
-
-## Sample Output
-
-<p align="center">
-<img src="images/benchmark.png" width="850"/>
-</p>
-
-Example:
-
-```
-TOTAL INDEXING TIME : 35.4 seconds
-
-Images/sec : 8.47
-
-Images/min : 508.20
-```
-
----
-
-## Search Performance
-
-Since all image embeddings are generated offline, online retrieval performs only lightweight operations.
-
-Typical search flow:
-
-```
-Natural Language Query
-
-↓
-
-CLIP Text Encoding
-
-↓
-
-FAISS Vector Search
-
-↓
-
-Ranking
-
-↓
-
-Metadata Hydration
-
-↓
-
-Results
-```
-
-The retrieval pipeline avoids expensive image processing during search, enabling responsive query execution.
-
 ---
 
 ## Design Trade-off
@@ -622,149 +644,7 @@ This allows:
 The trade-off is a longer offline indexing process, which is acceptable because indexing is performed infrequently while search is executed repeatedly.
 
 
-# Reliability
-
-SIRE was designed to continue operating gracefully when encountering invalid inputs, missing resources, or runtime failures. The indexing and retrieval pipelines include validation, structured logging, exception handling, and automated unit tests to improve reliability and simplify debugging.
-
 ---
-
-# Fault Tolerance
-
-## Offline Indexing
-
-The indexing pipeline validates images and external services before persisting data.
-
-| Scenario | Handling |
-|----------|----------|
-| Dataset folder missing | Indexing exits gracefully |
-| Empty dataset | Indexing terminates safely |
-| Unsupported file formats | Files skipped |
-| Corrupted images | Image skipped, processing continues |
-| Cloudinary upload failure | Exception raised and logged |
-| PostgreSQL failure | Transaction rolled back |
-
----
-
-## Online Retrieval
-
-The retrieval pipeline validates requests and handles runtime failures without exposing internal implementation details.
-
-| Scenario | Handling |
-|----------|----------|
-| Empty search query | Returns an empty result |
-| Missing FAISS index | Runtime error raised |
-| CLIP encoding failure | Search terminated safely |
-| Database failure | Error logged and propagated |
-| Invalid pagination | Automatically corrected |
-
----
-
-# Logging
-
-To simplify debugging and monitor pipeline execution, SIRE maintains separate log files for indexing, query execution, and runtime failures.
-
-## Index Logs
-
-Recorded events include:
-
-- Indexing started
-- Dataset size
-- Batch processing
-- Checkpoint creation
-- Index completion
-
-Example:
-
-```
-2026-06-30 11:04:54 | INFO | Indexing started
-2026-06-30 11:04:55 | INFO | Found 2 images to index
-2026-06-30 11:04:55 | INFO | Processing batch 0 - 2
-2026-06-30 11:04:59 | INFO | Checkpoint saved
-2026-06-30 11:04:59 | INFO | Indexing completed
-```
-
----
-
-## Query Logs
-
-Every search records:
-
-- User query
-- Pagination parameters
-- Number of returned results
-- Search completion
-
-Example:
-
-```
-2026-06-30 11:12:08 | INFO | Query="blue shirt" Page=1 Limit=12
-2026-06-30 11:12:09 | INFO | Query completed. Results=12
-```
-
----
-
-## Error Logs
-
-Failures are recorded separately for easier troubleshooting.
-
-Example events include:
-
-- Corrupted image skipped
-- Missing dataset
-- Empty dataset
-- PostgreSQL rollback
-- Search failure
-
----
-
-## Sample Logs
-
-<p align="center">
-<img src="images/logging.png" width="900"/>
-</p>
-
----
-
-# Testing
-
-SIRE includes **12 automated unit tests** covering the project's core business logic.
-
-## Test Coverage
-
-| Component | Tests |
-|-----------|------:|
-| RankingService | 4 |
-| SearchService | 3 |
-| BuildIndexService | 3 |
-| FAISSVectorStore | 2 |
-| **Total** | **12** |
-
-The test suite validates:
-
-- Ranking correctness
-- Similarity threshold filtering
-- Quality-aware tie breaking
-- Search pipeline execution
-- Failure handling
-- Indexing validation
-- Corrupted image detection
-- FAISS ID mapping
-
----
-
-## Test Results
-
-<p align="center">
-<img src="images/tests.png" width="900"/>
-</p>
-
-```
-========================================================
-12 passed in 0.83s
-========================================================
-```
-
-The tests focus on validating application logic rather than third-party libraries, ensuring the retrieval pipeline behaves correctly under both normal and failure scenarios.
 
 
 # Deployment
@@ -781,9 +661,9 @@ The deployed application exposes:
 
 ## Live Demo
 
-🌐 Demo: https://<your-render-url>
+🌐 Demo: (Soon)
 
-📘 Swagger: https://<your-render-url>/docs
+📘 Swagger: (Soon)
 
 ---
 
@@ -828,30 +708,6 @@ Supported demo queries include:
 
 The remainder of the retrieval pipeline remains unchanged.
 
-```
-Query
-
-↓
-
-Precomputed Embedding
-
-↓
-
-FAISS Search
-
-↓
-
-Ranking
-
-↓
-
-Metadata Hydration
-
-↓
-
-Results
-```
-
 This optimization affects only the deployed demo.
 
 The local development version performs full real-time CLIP text encoding for arbitrary natural language queries.
@@ -869,75 +725,6 @@ This deployment strategy was chosen because:
 
 The optimization is purely deployment-specific and does not change the core system design.
 
-
-# Tech Stack
-
-## Backend
-
-- FastAPI
-- SQLAlchemy
-- Pydantic
-
-## Vector Search
-
-- FAISS
-
-## Embedding Model
-
-- OpenAI CLIP (ViT-B/32)
-
-## Database
-
-- PostgreSQL
-
-## Cloud Storage
-
-- Cloudinary
-
-## Image Processing
-
-- Pillow
-- OpenCV
-
-## Machine Learning
-
-- PyTorch
-- Hugging Face Transformers
-
-## Testing
-
-- Pytest
-
-## Deployment
-
-- Render
-
-
-# Project Structure
-
-```
-SIRE/
-
-├── app/
-│
-├── api/                # FastAPI routes
-├── database/           # SQLAlchemy models and sessions
-├── embeddings/         # CLIP embedding provider
-├── indexing/           # FAISS index builder
-├── quality/            # Image quality scoring
-├── repositories/       # Database access layer
-├── schemas/            # Request and response models
-├── services/           # Indexing and search workflows
-├── storage/            # Cloudinary integration
-├── utils/              # Logging and timers
-├── vector_store/       # FAISS retrieval
-│
-├── dataset/            # Images to index
-├── storage/            # FAISS index
-├── scripts/            # Offline indexing scripts
-├── tests/              # Automated unit tests
-└── requirements.txt
-```
 
 ---
 
@@ -1030,65 +817,12 @@ http://127.0.0.1:8000/
 
 # Example Search
 
-```
-blue shirt
-
-↓
-
-Semantic Search
-
-↓
-
-Top Matching Images
-```
-
 Example queries:
 
 - Blue Shirt
 - Wireless Headphones
 - White Sneakers
 - Coffee Mug
-
----
-
-# Technologies Used
-
-## Backend
-
-- FastAPI
-- SQLAlchemy
-- Pydantic
-
-## Machine Learning
-
-- CLIP (ViT-B/32)
-- Hugging Face Transformers
-- PyTorch
-
-## Vector Search
-
-- FAISS
-
-## Database
-
-- PostgreSQL
-
-## Cloud Storage
-
-- Cloudinary
-
-## Image Processing
-
-- Pillow
-- OpenCV
-
-## Testing
-
-- Pytest
-
-## Deployment
-
-- Render
 
 ---
 

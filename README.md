@@ -528,39 +528,6 @@ This design provides several advantages:
 
 ---
 
-### FAISS ID Mapping
-
-FAISS stores only vectors and their corresponding `faiss_id`.
-
-Example:
-
-```
-FAISS
-
-Vector A
-↓
-
-faiss_id = 25
-
------------------------
-
-PostgreSQL
-
-faiss_id = 25
-
-↓
-
-shirt_blue.jpg
-
-↓
-
-https://...
-```
-
-The `faiss_id` acts as the bridge between the vector index and the relational database.
-
----
-
 ### Indexing Lifecycle
 
 Every image progresses through a simple indexing lifecycle.

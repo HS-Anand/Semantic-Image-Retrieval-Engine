@@ -21,46 +21,50 @@ from app.services.index_builder import BuildIndexService
 db = SessionLocal()
 INDEX_PATH = "storage/image.index"
 
-service = BuildIndexService(
-    storage=CloudinaryStorage(),
-    embedding_provider=CLIPProvider(),
-    index_builder=FAISSIndexBuilder(INDEX_PATH),
-    repository=ImageRepository(db),
-    quality_scorer=ImageQualityScorer()
-)
+try:
+    service = BuildIndexService(
+        storage=CloudinaryStorage(),
+        embedding_provider=CLIPProvider(),
+        index_builder=FAISSIndexBuilder(INDEX_PATH),
+        repository=ImageRepository(db),
+        quality_scorer=ImageQualityScorer()
+    )
 
-IMAGE_COUNT = len(
-    [
-        file for file in os.listdir("dataset")
-        if file.lower().endswith(
-            (
-                ".jpg",
-                ".jpeg",
-                ".png",
-                ".webp"
+    IMAGE_COUNT = len(
+        [
+            file for file in os.listdir("dataset")
+            if file.lower().endswith(
+                (
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".webp"
+                )
             )
+        ]
+    )
+
+    with Timer("TOTAL INDEXING TIME") as total_timer:
+
+        service.index_folder(
+            folder_path="dataset",
+            output_index_path=INDEX_PATH
         )
-    ]
-)
 
-with Timer("TOTAL INDEXING TIME") as total_timer:
 
-    service.index_folder(
-        folder_path="dataset",
-        output_index_path=INDEX_PATH
+    print("Index build completed")
+
+
+    print(
+        "Images/sec:",
+        round(IMAGE_COUNT / total_timer.duration, 2)
     )
 
 
-print("Index build completed")
+    print(
+        "Images/min:", 
+        round((IMAGE_COUNT / total_timer.duration) * 60, 2)
+    )
 
-
-print(
-    "Images/sec:",
-    round(IMAGE_COUNT / total_timer.duration, 2)
-)
-
-
-print(
-    "Images/min:", 
-    round((IMAGE_COUNT / total_timer.duration) * 60, 2)
-)
+finally:
+    db.close()

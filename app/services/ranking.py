@@ -22,11 +22,7 @@ class RankingService:
             return []
 
 
-        similarity_threshold = (
-            best_similarity
-            -
-            0.05
-        )
+        similarity_threshold = (best_similarity - 0.05)
 
 
         for image_id, similarity in candidates:

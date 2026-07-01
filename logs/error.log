@@ -1,2 +1,20 @@
 2026-06-30 11:05:39,425 | WARNING | No supported images found in dataset
 2026-06-30 11:15:04,963 | WARNING | Corrupted image skipped: dataset/corrupt.jpg
+2026-07-01 10:55:22,730 | INFO | Empty query in search
+2026-07-01 10:55:22,733 | INFO | Search failed
+2026-07-01 11:10:55,848 | WARNING | Dataset folder not found: invalid/path
+2026-07-01 11:10:55,851 | WARNING | No supported images found in dataset
+2026-07-01 11:10:55,857 | INFO | Empty query in search
+2026-07-01 11:10:55,860 | INFO | Search failed
+2026-07-01 11:13:09,766 | WARNING | Dataset folder not found: invalid/path
+2026-07-01 11:13:09,768 | WARNING | No supported images found in dataset
+2026-07-01 11:13:09,778 | INFO | Empty query in search
+2026-07-01 11:13:09,780 | INFO | Search failed
+2026-07-01 11:13:55,369 | WARNING | Dataset folder not found: invalid/path
+2026-07-01 11:13:55,371 | WARNING | No supported images found in dataset
+2026-07-01 11:13:55,402 | INFO | Empty query in search
+2026-07-01 11:13:55,412 | INFO | Search failed
+2026-07-01 11:14:15,518 | WARNING | Dataset folder not found: invalid/path
+2026-07-01 11:14:15,520 | WARNING | No supported images found in dataset
+2026-07-01 11:14:15,529 | INFO | Empty query in search
+2026-07-01 11:14:15,531 | INFO | Search failed

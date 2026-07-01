@@ -42,10 +42,7 @@ def test_returns_stored_faiss_ids():
 
         store = FAISSVectorStore(index_path)
 
-        results = store.search(
-            vectors[0],
-            k=2
-        )
+        results = store.search(vectors[0],k=2)
 
         returned_ids = [
             image_id

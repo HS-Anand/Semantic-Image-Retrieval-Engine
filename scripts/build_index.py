@@ -23,20 +23,15 @@ INDEX_PATH = "storage/image.index"
 
 service = BuildIndexService(
     storage=CloudinaryStorage(),
-
     embedding_provider=CLIPProvider(),
-
     index_builder=FAISSIndexBuilder(INDEX_PATH),
-
     repository=ImageRepository(db),
-
     quality_scorer=ImageQualityScorer()
 )
 
 IMAGE_COUNT = len(
     [
-        file
-        for file in os.listdir("dataset")
+        file for file in os.listdir("dataset")
         if file.lower().endswith(
             (
                 ".jpg",

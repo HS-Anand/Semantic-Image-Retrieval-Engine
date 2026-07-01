@@ -19,20 +19,14 @@ def test_low_similarity_returns_empty_list():
 
     service = RankingService()
 
-    candidates = [
-        (1, 0.24),
-        (2, 0.23)
-    ]
+    candidates = [(1, 0.24), (2, 0.23)]
 
     features = [
         SimpleNamespace(faiss_id=1, quality_score=0.8),
         SimpleNamespace(faiss_id=2, quality_score=0.5)
     ]
 
-    result = service.rank(
-        candidates,
-        features
-    )
+    result = service.rank(candidates, features)
 
     assert result == []
 
@@ -43,10 +37,7 @@ def test_quality_score_does_not_override_similarity():
 
     service = RankingService()
 
-    candidates = [
-        (1, 0.90),
-        (2, 0.89)
-    ]
+    candidates = [(1, 0.90), (2, 0.89)]
 
     features = [
         SimpleNamespace(
@@ -59,10 +50,7 @@ def test_quality_score_does_not_override_similarity():
         )
     ]
 
-    result = service.rank(
-        candidates,
-        features
-    )
+    result = service.rank(candidates, features)
 
     assert result == [1, 2]
 
@@ -73,10 +61,7 @@ def test_missing_quality_defaults_to_zero():
 
     service = RankingService()
 
-    candidates = [
-        (1, 0.90),
-        (2, 0.88)
-    ]
+    candidates = [(1, 0.90), (2, 0.88)]
 
     features = [
         SimpleNamespace(
@@ -85,9 +70,6 @@ def test_missing_quality_defaults_to_zero():
         )
     ]
 
-    result = service.rank(
-        candidates,
-        features
-    )
+    result = service.rank(candidates, features)
 
     assert result == [1, 2]

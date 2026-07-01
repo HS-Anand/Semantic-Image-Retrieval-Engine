@@ -58,12 +58,8 @@ class SearchService:
                 with Timer("FAISS SEARCH"):
 
                     candidates = (
-                        self.vector_store.search(
-                            query_vector,
-                            k=200
-                        )
+                        self.vector_store.search(query_vector,k=200)
                     )
-
 
                 candidate_ids = [
                     image_id
@@ -75,19 +71,14 @@ class SearchService:
 
                     features = (
                         self.image_repository
-                        .get_ranking_features(
-                            candidate_ids
-                        )
+                        .get_ranking_features(candidate_ids)
                     )
 
 
                 with Timer("RANKING"):
 
                     ranked_ids = (
-                        self.ranking_service.rank(
-                            candidates,
-                            features
-                        )
+                        self.ranking_service.rank(candidates, features)
                     )
 
 
@@ -103,9 +94,7 @@ class SearchService:
 
                     results = (
                         self.image_repository
-                        .hydrate_results(
-                            ranked_ids
-                        )
+                        .hydrate_results(ranked_ids)
                     )
 
                 query_logger.info(f'Query completed. Results={len(results)}')

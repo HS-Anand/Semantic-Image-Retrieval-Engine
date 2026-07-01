@@ -13,7 +13,6 @@ class ImageAsset(Base):
 
     __tablename__ = "images"
 
-
     id = Column(
         UUID(as_uuid=True),
         primary_key=True,
@@ -26,35 +25,29 @@ class ImageAsset(Base):
         index=True
     )
 
-
     file_name = Column(
         String,
         nullable=False
     )
 
-
     category = Column(
         String
     )
-
 
     image_url = Column(
         String,
         nullable=False
     )
 
-
     quality_score = Column(
         Float,
         default=1.0
     )
 
-
     index_status = Column(
         String,
         default="UPLOADED"
     )
-
 
     created_at = Column(
         DateTime,

@@ -32,10 +32,7 @@ def test_successful_search_pipeline(
 
     embedding_provider.encode_text.return_value = [0.1, 0.2]
 
-    vector_store.search.return_value = [
-        (1, 0.91),
-        (2, 0.88)
-    ]
+    vector_store.search.return_value = [(1, 0.91), (2, 0.88)]
 
     repository = mock_image_repository.return_value
 
@@ -44,10 +41,7 @@ def test_successful_search_pipeline(
         Mock(faiss_id=2, quality_score=0.5)
     ]
 
-    mock_ranking_service.return_value.rank.return_value = [
-        1,
-        2
-    ]
+    mock_ranking_service.return_value.rank.return_value = [1, 2]
 
     repository.hydrate_results.return_value = [
         {

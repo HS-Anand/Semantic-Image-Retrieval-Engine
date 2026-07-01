@@ -7,7 +7,6 @@ from app.utils.logger import error_logger
 class ImageRepository:
 
     def __init__(self, db):
-
         self.db = db
 
     def exists_by_file_name(self, file_name):
@@ -40,9 +39,7 @@ class ImageRepository:
                 ImageAsset.faiss_id,
                 ImageAsset.quality_score
             )
-            .filter(
-                ImageAsset.faiss_id.in_(faiss_ids)
-            )
+            .filter(ImageAsset.faiss_id.in_(faiss_ids))
             .all()
         )
 
@@ -57,9 +54,7 @@ class ImageRepository:
                 ImageAsset.file_name,
                 ImageAsset.image_url
             )
-            .filter(
-                ImageAsset.faiss_id.in_(faiss_ids)
-            )
+            .filter(ImageAsset.faiss_id.in_(faiss_ids))
             .all()
         )
 

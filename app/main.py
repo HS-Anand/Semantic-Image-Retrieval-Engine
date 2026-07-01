@@ -15,10 +15,7 @@ from app.database import models
 
 
 
-Base.metadata.create_all(
-    bind=engine
-)
-
+Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI(
@@ -28,15 +25,11 @@ app = FastAPI(
 )
 
 
-
 app.mount(
     "/static",
-    StaticFiles(
-        directory="app/static"
-    ),
+    StaticFiles(directory="app/static"),
     name="static"
 )
-
 
 
 app.include_router(

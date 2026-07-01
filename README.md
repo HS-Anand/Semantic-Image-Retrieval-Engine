@@ -78,50 +78,6 @@ This architecture enables fast semantic retrieval while keeping vector search an
 
 # Engineering Highlights
 
-
-## Tech Stack
-
-### Backend
-
-- FastAPI
-- SQLAlchemy
-- Pydantic
-
-### Vector Search
-
-- FAISS
-
-### Embedding Model
-
-- OpenAI CLIP (ViT-B/32)
-
-### Database
-
-- PostgreSQL
-
-### Cloud Storage
-
-- Cloudinary
-
-### Image Processing
-
-- Pillow
-- OpenCV
-
-### Machine Learning
-
-- PyTorch
-- Hugging Face Transformers
-
-### Testing
-
-- Pytest
-
-### Deployment
-
-- Render
-
-
 ### Offline Batch Indexing Pipeline
 
 Images are processed through a fault-tolerant offline indexing pipeline that performs validation, image quality scoring, semantic embedding generation, cloud storage upload, vector indexing, and metadata persistence.

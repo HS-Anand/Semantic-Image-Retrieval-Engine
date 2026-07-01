@@ -11,9 +11,9 @@
 ![Pytest](https://img.shields.io/badge/Pytest-Testing-0A9EDC)
 ![Tests](https://img.shields.io/badge/Tests-12%20Passed-brightgreen)
 
-## Low-latency semantic image retrieval using natural language search.
+## Low-latency image retrieval using semantic vector search.
 
-SIRE is a backend system that transforms unstructured image collections into searchable vector representations through an offline indexing pipeline and retrieves semantically relevant images from natural language queries in milliseconds.
+SIRE is a backend system that transforms unstructured image collections into searchable vector representations through an offline indexing pipeline and retrieves semantically relevant images from text queries in milliseconds.
 
 Instead of relying on filenames, folders, or manually assigned tags, SIRE understands the visual meaning of images using CLIP embeddings, performs fast similarity search with FAISS, and enriches the retrieved results with metadata stored in PostgreSQL.
 
@@ -31,7 +31,7 @@ Instead of relying on filenames, folders, or manually assigned tags, SIRE unders
 
 <img src="images/retreivel images/retreived_images.png" alt="Search Preview" width="900"/>
 
-Users can search using natural language queries such as:
+Users can search using queries/texts such as:
 
 - "Office wear"
 - "Yellow khadi kurti"
@@ -52,7 +52,7 @@ These approaches fail when images are unlabeled or when users search using natur
 
 SIRE solves this problem by representing both images and text within the same semantic embedding space using CLIP. During indexing, image embeddings are generated offline and stored inside a FAISS vector index, while image metadata is maintained separately in PostgreSQL.
 
-At query time, the user's natural language is encoded into an embedding, matched against the FAISS index using cosine similarity, re-ranked using image quality, and finally hydrated with metadata before being returned to the client.
+At query time, the user's query/text is encoded into an embedding, matched against the FAISS index using cosine similarity, re-ranked using image quality, and finally hydrated with metadata before being returned to the client.
 
 This architecture enables fast semantic retrieval while keeping vector search and metadata management independent.
 

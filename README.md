@@ -40,7 +40,7 @@ without requiring filenames or manually assigned tags.
 
 ---
 
-# Search Pipeline
+## Search Pipeline
 
 ```
 Natural Language Query
@@ -79,45 +79,45 @@ This architecture enables fast semantic retrieval while keeping vector search an
 # Engineering Highlights
 
 
-### Tech Stack
+## Tech Stack
 
-## Backend
+### Backend
 
 - FastAPI
 - SQLAlchemy
 - Pydantic
 
-## Vector Search
+### Vector Search
 
 - FAISS
 
-## Embedding Model
+### Embedding Model
 
 - OpenAI CLIP (ViT-B/32)
 
-## Database
+### Database
 
 - PostgreSQL
 
-## Cloud Storage
+### Cloud Storage
 
 - Cloudinary
 
-## Image Processing
+### Image Processing
 
 - Pillow
 - OpenCV
 
-## Machine Learning
+### Machine Learning
 
 - PyTorch
 - Hugging Face Transformers
 
-## Testing
+### Testing
 
 - Pytest
 
-## Deployment
+### Deployment
 
 - Render
 
@@ -186,11 +186,11 @@ Images that are semantically similar but visually sharper receive a small rankin
 
 ---
 
-# Fault Tolerance
+## Fault Tolerance
 
 The indexing and retrieval pipelines gracefully handle common failure scenarios.
 
-## Offline Indexing
+### Offline Indexing
 
 The indexing pipeline validates images and external services before persisting data.
 
@@ -205,7 +205,7 @@ The indexing pipeline validates images and external services before persisting d
 
 ---
 
-## Online Retrieval
+### Online Retrieval
 
 The retrieval pipeline validates requests and handles runtime failures without exposing internal implementation details.
 
@@ -219,7 +219,7 @@ The retrieval pipeline validates requests and handles runtime failures without e
 
 ---
 
-# Logging
+## Logging
 
 To simplify debugging and monitor pipeline execution, SIRE maintains separate log files for indexing, query execution, and runtime failures.
 
@@ -249,7 +249,7 @@ This makes indexing progress and runtime failures easy to monitor and debug.
 
 ---
 
-## Sample Logs
+### Sample Logs
 
 <p align="center">
 <img src="images/logs_images/error-log.png" width="900"/>
@@ -257,7 +257,7 @@ This makes indexing progress and runtime failures easy to monitor and debug.
 
 ---
 
-### Performance Optimization
+## Performance Optimization
 
 Several optimizations were introduced to reduce indexing time.
 
@@ -269,7 +269,7 @@ Several optimizations were introduced to reduce indexing time.
 
 These optimizations improved indexing throughput from approximately **75 images/minute** to over **500 images/minute** on the development machine.
 
-# Benchmark Results
+### Benchmark Results
 
 | Metric | Before Optimization | After Optimization |
 |---------|--------------------:|-------------------:|
@@ -278,14 +278,14 @@ These optimizations improved indexing throughput from approximately **75 images/
 
 ---
 
-## Sample Output
+### Sample Output
 
 <p align="center">
 <img src="images/offline-image-batch_processing/7.5k/Screenshot 2026-06-24 at 5.13.38 PM.png" width="850"/>
 </p>
 
 
-## Search Performance
+### Search Performance
 
 Since all image embeddings are generated offline, online retrieval performs only lightweight operations.
 
@@ -352,7 +352,7 @@ The test suite validates:
 
 ---
 
-## Test Results
+### Test Results
 
 <p align="center">
 <img src="images/testcases_images/test_cases.png" width="900"/>
@@ -374,7 +374,7 @@ This separation keeps the retrieval pipeline maintainable, model-agnostic, and a
 
 ---
 
-## Offline Indexing Pipeline
+### Offline Indexing Pipeline
 
 The offline pipeline processes images once and prepares them for fast semantic retrieval.
 
@@ -436,7 +436,7 @@ FAISS Index      PostgreSQL Metadata
 
 ---
 
-## Online Retrieval Pipeline
+### Online Retrieval Pipeline
 
 The online pipeline retrieves semantically relevant images from natural language queries.
 
@@ -477,7 +477,7 @@ JSON Response
 
 ---
 
-## Project Structure
+### Project Structure
 
 ```
 SIRE/
@@ -505,7 +505,7 @@ SIRE/
 
 ---
 
-## Design Principles
+### Design Principles
 
 SIRE was designed around a few core engineering principles.
 
@@ -519,7 +519,7 @@ SIRE was designed around a few core engineering principles.
 
 - **Fault Tolerant** — Failures during indexing and retrieval are detected and handled gracefully without interrupting the overall pipeline.
 
-# Database Design
+## Database Design
 
 SIRE stores only image metadata in PostgreSQL while semantic vectors are maintained separately inside the FAISS index.
 
@@ -527,7 +527,7 @@ This hybrid architecture keeps vector search fast while allowing metadata to be 
 
 ---
 
-## ImageAsset Model
+### ImageAsset Model
 
 Each indexed image is represented by a single database record.
 
@@ -544,7 +544,7 @@ Each indexed image is represented by a single database record.
 
 ---
 
-## Why Separate FAISS and PostgreSQL?
+### Why Separate FAISS and PostgreSQL?
 
 Instead of storing vectors directly inside PostgreSQL, SIRE separates retrieval into two independent layers.
 
@@ -572,7 +572,7 @@ This design provides several advantages:
 
 ---
 
-## FAISS ID Mapping
+### FAISS ID Mapping
 
 FAISS stores only vectors and their corresponding `faiss_id`.
 
@@ -605,7 +605,7 @@ The `faiss_id` acts as the bridge between the vector index and the relational da
 
 ---
 
-## Indexing Lifecycle
+### Indexing Lifecycle
 
 Every image progresses through a simple indexing lifecycle.
 
@@ -626,7 +626,7 @@ without affecting the retrieval pipeline.
 
 ---
 
-## Design Trade-off
+### Design Trade-off
 
 SIRE intentionally shifts computationally expensive operations from query time to indexing time.
 
@@ -642,7 +642,7 @@ The trade-off is a longer offline indexing process, which is acceptable because 
 ---
 
 
-# Deployment
+## Deployment
 
 SIRE is deployed on Render for demonstration purposes.
 
@@ -654,7 +654,7 @@ The deployed application exposes:
 
 ---
 
-## Live Demo
+### Live Demo
 
 🌐 Demo: (Soon)
 
@@ -662,7 +662,7 @@ The deployed application exposes:
 
 ---
 
-## Deployment Architecture
+### Deployment Architecture
 
 ```
 User
@@ -686,7 +686,7 @@ Cloudinary Images
 
 ---
 
-## Deployment Optimization
+### Deployment Optimization
 
 The complete SIRE pipeline performs live CLIP text embedding during query execution.
 
@@ -709,7 +709,7 @@ The local development version performs full real-time CLIP text encoding for arb
 
 ---
 
-## Why This Approach?
+### Why This Approach?
 
 This deployment strategy was chosen because:
 
@@ -723,7 +723,7 @@ The optimization is purely deployment-specific and does not change the core syst
 
 ---
 
-# Local Setup
+## Local Setup
 
 Clone the repository
 
@@ -749,7 +749,7 @@ pip install -r requirements.txt
 
 ---
 
-# Environment Variables
+## Environment Variables
 
 Create a `.env` file.
 
@@ -767,7 +767,7 @@ CLOUDINARY_API_SECRET=...
 
 ---
 
-# Build the Index
+## Build the Index
 
 Place your images inside the `dataset/` directory.
 
@@ -788,7 +788,7 @@ The indexing pipeline will:
 
 ---
 
-# Run the API
+## Run the API
 
 Start the FastAPI server
 
@@ -810,7 +810,7 @@ http://127.0.0.1:8000/
 
 ---
 
-# Example Search
+## Example Search
 
 Example queries:
 
@@ -821,7 +821,7 @@ Example queries:
 
 ---
 
-# Future Improvements
+## Future Improvements
 
 - Replace exact vector search with approximate nearest-neighbor indexes such as HNSW or IVF for larger datasets.
 
@@ -835,7 +835,7 @@ Example queries:
 
 ---
 
-# Author
+## Author
 
 **Harkaran Anand**
 

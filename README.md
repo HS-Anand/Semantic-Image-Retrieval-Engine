@@ -44,29 +44,6 @@ without requiring filenames or manually assigned tags.
 
 ---
 
-## Search Pipeline
-
-```
-Natural Language Query
-        │
-        ▼
-CLIP Text Encoder
-        │
-        ▼
-FAISS Vector Search
-        │
-        ▼
-Quality-aware Ranking
-        │
-        ▼
-PostgreSQL Metadata Retrieval
-        │
-        ▼
-Relevant Images Returned
-```
-
----
-
 # Why SIRE?
 
 Traditional image retrieval systems depend on filenames, folders, or manually assigned labels to locate images.

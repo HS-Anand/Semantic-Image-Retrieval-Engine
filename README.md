@@ -2,9 +2,14 @@
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green)
-![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-orange)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-red)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
+![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-orange)
 ![PyTorch](https://img.shields.io/badge/PyTorch-CLIP-red)
+![Transformers](https://img.shields.io/badge/Transformers-HuggingFace-yellow)
+![OpenCV](https://img.shields.io/badge/OpenCV-Image%20Processing-blueviolet)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-Image%20Storage-3448C5)
+![Pytest](https://img.shields.io/badge/Pytest-Testing-0A9EDC)
 ![Tests](https://img.shields.io/badge/Tests-12%20Passed-brightgreen)
 
 ## Low-latency semantic image retrieval using natural language search.
